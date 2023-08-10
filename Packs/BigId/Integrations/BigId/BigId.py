@@ -2,7 +2,7 @@ import demistomock as demisto  # noqa: F401
 from CommonServerPython import *  # noqa: F401
 
 import urllib3
-from typing import Any, Dict
+from typing import Any
 
 # Disable insecure warnings
 urllib3.disable_warnings()
@@ -28,7 +28,7 @@ class Client(BaseClient):
     For this HelloWorld implementation, no special attributes defined
     """
 
-    def get_ds(self) -> Dict[str, Any]:
+    def get_ds(self) -> dict[str, Any]:
         """Request scanned data sources.
 
         Args:
@@ -44,7 +44,7 @@ class Client(BaseClient):
             }
         )
 
-    def get_scans_status(self) -> Dict[str, Any]:
+    def get_scans_status(self) -> dict[str, Any]:
         """Get full list of scans in the system and their status.
 
         Args:
@@ -63,7 +63,7 @@ class Client(BaseClient):
     # TODO: should I include the format feild (cuz i only think it works with json)
     def get_objects_from_catalog(self, skip, limit, filt, sort, ignoreLimit, sample,
                                  requireTotalCount, getColumnOrFieldOccurrencesCounterFlag,
-                                 getNumIdentitiesFlag, objectsCountTimeoutSec) -> Dict[str, Any]:
+                                 getNumIdentitiesFlag, objectsCountTimeoutSec) -> dict[str, Any]:
         """Fetches objects from the discovery catalog with the given filter string (can be taken from search bar in bigid).
 
         Args:
@@ -99,7 +99,7 @@ class Client(BaseClient):
             }
         )
 
-    def get_ds_connections(self, skip, limit, requireTotalCount, sort, filt) -> Dict[str, Any]:
+    def get_ds_connections(self, skip, limit, requireTotalCount, sort, filt) -> dict[str, Any]:
         """Retrieve one or more data source connections.
 
         Args:
@@ -126,7 +126,7 @@ class Client(BaseClient):
             }
         )
 
-    def get_session_token(self) -> Dict[str, Any]:
+    def get_session_token(self) -> dict[str, Any]:
         """exchanges the user_token for a session_token that can be used in further api calls
 
         Args:
@@ -142,7 +142,7 @@ class Client(BaseClient):
         )
 
     def initiate_scan(self, scanType, scanProfileName, scanOrigin, pii_record_id,
-                      with_investigation_window, record, type_of) -> Dict[str, Any]:
+                      with_investigation_window, record, type_of) -> dict[str, Any]:
         """Initiate a scan by scan profile.
 
         Args:
@@ -171,7 +171,7 @@ class Client(BaseClient):
             }
         )
 
-    def run_ds_scan(self, connectionName, isSampleScan, scanType, autoAssumeScanType) -> Dict[str, Any]:
+    def run_ds_scan(self, connectionName, isSampleScan, scanType, autoAssumeScanType) -> dict[str, Any]:
         """Run a scan on a data source.
 
         Args:
@@ -244,7 +244,7 @@ def get_scans_status_command(client: Client) -> CommandResults:
     )
 
 
-def get_objects_from_catalog_command(client: Client, args: Dict[str, Any]) -> CommandResults:
+def get_objects_from_catalog_command(client: Client, args: dict[str, Any]) -> CommandResults:
     """
     get-objects-from-catalog command: Gets a list of objects from the catalog and their metadata.
 
@@ -299,7 +299,7 @@ def get_objects_from_catalog_command(client: Client, args: Dict[str, Any]) -> Co
     )
 
 
-def get_ds_connections_command(client: Client, args: Dict[str, Any]) -> CommandResults:
+def get_ds_connections_command(client: Client, args: dict[str, Any]) -> CommandResults:
     """
     get-ds-connections command: Gets datasource connections in BigId instance as well as their metadata
 
@@ -339,7 +339,7 @@ def get_ds_connections_command(client: Client, args: Dict[str, Any]) -> CommandR
     )
 
 
-def initiate_scan_command(client: Client, args: Dict[str, Any]) -> CommandResults:
+def initiate_scan_command(client: Client, args: dict[str, Any]) -> CommandResults:
     """
     initiate-scan command: initiates a scan in bigid given the following parameters in args
 
@@ -378,7 +378,7 @@ def initiate_scan_command(client: Client, args: Dict[str, Any]) -> CommandResult
     )
 
 
-def run_ds_scan_command(client: Client, args: Dict[str, Any]) -> CommandResults:
+def run_ds_scan_command(client: Client, args: dict[str, Any]) -> CommandResults:
     """
     run-ds-scan command: initiates a ds scan in bigid given the following parameters in args
 
