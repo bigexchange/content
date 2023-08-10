@@ -1,0 +1,27 @@
+commonfields:
+  id: 1b36689f-446e-4274-84b3-3f7ab4fc6b98
+  version: 18
+vcShouldKeepItemLegacyProdMachine: false
+name: MergeS3BucketPolicy
+script: ''
+type: python
+tags: []
+comment: Merge the statements of multiple s3 bucket policies. The statements inside of secondPolicy will be added to those in first policy
+enabled: true
+args:
+- name: firstPolicy
+  required: true
+- name: secondPolicy
+  required: true
+outputs:
+- contextPath: MergeS3BucketPolicy.json
+  description: The outputted merged s3 bucket policy in json format.
+scripttarget: 0
+subtype: python3
+pswd: ""
+runonce: false
+dockerimage: demisto/python3:3.10.12.65389
+runas: DBotWeakRole
+engineinfo: {}
+mainengineinfo: {}
+
