@@ -1,0 +1,155 @@
+id: dd42c663-22df-4a07-84dc-31d7c0ee320c
+version: 17
+vcShouldKeepItemLegacyProdMachine: false
+name: S3 Remediation Orchestrator
+starttaskid: "0"
+tasks:
+  "0":
+    id: "0"
+    taskid: ce382016-b449-4187-8733-eef878cd4bad
+    type: start
+    task:
+      id: ce382016-b449-4187-8733-eef878cd4bad
+      version: -1
+      name: ""
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "1"
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 450,
+          "y": 50
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "1":
+    id: "1"
+    taskid: c8d17d10-74cb-4662-8276-d81fd38ebec6
+    type: regular
+    task:
+      id: c8d17d10-74cb-4662-8276-d81fd38ebec6
+      version: -1
+      name: get-objects-from-catalog
+      description: get the objects
+      script: BigId|||get-objects-from-catalog
+      type: regular
+      iscommand: true
+      brand: BigId
+    nexttasks:
+      '#none#':
+      - "2"
+    scriptarguments:
+      extend-context:
+        simple: buckets=results.containerName
+      filter:
+        simple: ${incident.triggeredsecurityprofile}
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 450,
+          "y": 230
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "2":
+    id: "2"
+    taskid: a5e4b2f6-3e76-4334-8855-8d69f8141d02
+    type: playbook
+    task:
+      id: a5e4b2f6-3e76-4334-8855-8d69f8141d02
+      version: -1
+      name: S3 Multiple File Remediation
+      playbookName: S3 Multiple File Remediation
+      type: playbook
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "5"
+    scriptarguments:
+      bucket:
+        simple: ${buckets}
+    separatecontext: true
+    continueonerrortype: ""
+    loop:
+      iscommand: false
+      exitCondition: ""
+      wait: 1
+      max: 100
+      forEach: true
+    view: |-
+      {
+        "position": {
+          "x": 450,
+          "y": 430
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "5":
+    id: "5"
+    taskid: ae04a324-04f4-41db-8c46-ea40e7fa7b7c
+    type: regular
+    task:
+      id: ae04a324-04f4-41db-8c46-ea40e7fa7b7c
+      version: -1
+      name: Close investigation
+      description: Close the current incident
+      script: Builtin|||closeInvestigation
+      type: regular
+      iscommand: true
+      brand: Builtin
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 450,
+          "y": 610
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+view: |-
+  {
+    "linkLabelsPosition": {},
+    "paper": {
+      "dimensions": {
+        "height": 655,
+        "width": 380,
+        "x": 450,
+        "y": 50
+      }
+    }
+  }
+inputs: []
+outputs: []

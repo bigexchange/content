@@ -1,0 +1,530 @@
+id: 9149b393-0d18-4cf3-85e9-37ab47a2e783
+version: 63
+vcShouldKeepItemLegacyProdMachine: false
+name: S3 Multiple File Remediation
+starttaskid: "0"
+tasks:
+  "0":
+    id: "0"
+    taskid: ffa471ec-fe4e-480b-8674-51341fa7e49b
+    type: start
+    task:
+      id: ffa471ec-fe4e-480b-8674-51341fa7e49b
+      version: -1
+      name: ""
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "11"
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 265,
+          "y": 65
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "1":
+    id: "1"
+    taskid: c5928ad9-943f-4769-83e5-5624636a98c0
+    type: regular
+    task:
+      id: c5928ad9-943f-4769-83e5-5624636a98c0
+      version: -1
+      name: get-objects-from-catalog
+      description: get the objects
+      script: BigId|||get-objects-from-catalog
+      type: regular
+      iscommand: true
+      brand: BigId
+    nexttasks:
+      '#none#':
+      - "8"
+    scriptarguments:
+      extend-context:
+        simple: problem_files=results.fullObjectName
+      filter:
+        simple: fullyQualifiedName = /.*\.${inputs.bucket}/  AND ${incident.triggeredsecurityprofile}
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 265,
+          "y": 575
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "4":
+    id: "4"
+    taskid: d8e4147d-43b7-4958-8f23-f914eb1e4e0e
+    type: regular
+    task:
+      id: d8e4147d-43b7-4958-8f23-f914eb1e4e0e
+      version: -1
+      name: aws-s3-put-bucket-policy
+      description: Replaces a policy on a bucket. If the bucket already has a policy,
+        the one in this request completely replaces it.
+      script: AWS - S3|||aws-s3-put-bucket-policy
+      type: regular
+      iscommand: true
+      brand: AWS - S3
+    nexttasks:
+      '#none#':
+      - "5"
+    scriptarguments:
+      bucket:
+        simple: ${inputs.bucket}
+      confirmRemoveSelfBucketAccess:
+        simple: "False"
+      policy:
+        simple: |-
+          {
+          "Version": "2012-10-17",
+          "Statement": [
+          {
+          "Sid": "DenyGetBucket",
+          "Effect": "Deny",
+          "Principal": "*",
+          "Action": [
+          "s3:GetObject"
+          ],
+          "Resource": ${Targets}
+          }
+          ]
+          }
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 50,
+          "y": 1450
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "5":
+    id: "5"
+    taskid: 92aab9e8-3fa2-4d6c-80a5-efbab7195bd4
+    type: regular
+    task:
+      id: 92aab9e8-3fa2-4d6c-80a5-efbab7195bd4
+      version: -1
+      name: aws-s3-get-bucket-policy
+      description: Get AWS S3 Bucket Policy
+      script: AWS - S3|||aws-s3-get-bucket-policy
+      type: regular
+      iscommand: true
+      brand: AWS - S3
+    scriptarguments:
+      bucket:
+        simple: ${inputs.bucket}
+      extend-context:
+        simple: newJson=Json
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 265,
+          "y": 1625
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "6":
+    id: "6"
+    taskid: b10e454d-89eb-4dc3-8c8c-1e8515abe239
+    type: regular
+    task:
+      id: b10e454d-89eb-4dc3-8c8c-1e8515abe239
+      version: -1
+      name: Set Targets list
+      description: Set a value in context under the key you entered.
+      scriptName: Set
+      type: regular
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "13"
+    scriptarguments:
+      key:
+        simple: Targets
+      value:
+        complex:
+          root: BigId.FilteredObjects.results
+          accessor: fullObjectName
+          transformers:
+          - operator: concat
+            args:
+              prefix:
+                value:
+                  simple: 'arn:aws:s3:::'
+              suffix: {}
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 50,
+          "y": 925
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "8":
+    id: "8"
+    taskid: e5729a85-68ec-4d0d-881f-1456c557386c
+    type: condition
+    task:
+      id: e5729a85-68ec-4d0d-881f-1456c557386c
+      version: -1
+      name: Has length of 1?
+      type: condition
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#default#':
+      - "6"
+      "yes":
+      - "9"
+    separatecontext: false
+    conditions:
+    - label: "yes"
+      condition:
+      - - operator: hasLength
+          left:
+            value:
+              simple: BigId.FilteredObjects.results.fullObjectName
+            iscontext: true
+          right:
+            value:
+              simple: "1"
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 265,
+          "y": 750
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "9":
+    id: "9"
+    taskid: 91ac2e10-c7de-4148-8151-5f93117ea7fd
+    type: regular
+    task:
+      id: 91ac2e10-c7de-4148-8151-5f93117ea7fd
+      version: -1
+      name: Set single target
+      description: Set a value in context under the key you entered.
+      scriptName: Set
+      type: regular
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "13"
+    scriptarguments:
+      key:
+        simple: Targets
+      value:
+        complex:
+          root: BigId.FilteredObjects.results
+          accessor: fullObjectName
+          transformers:
+          - operator: concat
+            args:
+              prefix:
+                value:
+                  simple: '["arn:aws:s3:::'
+              suffix:
+                value:
+                  simple: '"]'
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 480,
+          "y": 925
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "11":
+    id: "11"
+    taskid: b2ea8311-9b29-47a0-8fd8-1358b92b5d7e
+    type: regular
+    task:
+      id: b2ea8311-9b29-47a0-8fd8-1358b92b5d7e
+      version: -1
+      name: Delete context
+      description: |-
+        Delete field from context.
+
+        This automation runs using the default Limited User role, unless you explicitly change the permissions.
+        For more information, see the section about permissions here:
+        https://docs-cortex.paloaltonetworks.com/r/Cortex-XSOAR/6.10/Cortex-XSOAR-Administrator-Guide/Automations
+      scriptName: DeleteContext
+      type: regular
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "12"
+    scriptarguments:
+      key:
+        simple: Targets
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 265,
+          "y": 225
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "12":
+    id: "12"
+    taskid: 9cb4605e-0813-4c64-896b-84541921b316
+    type: regular
+    task:
+      id: 9cb4605e-0813-4c64-896b-84541921b316
+      version: -1
+      name: Delete context
+      description: |-
+        Delete field from context.
+
+        This automation runs using the default Limited User role, unless you explicitly change the permissions.
+        For more information, see the section about permissions here:
+        https://docs-cortex.paloaltonetworks.com/r/Cortex-XSOAR/6.10/Cortex-XSOAR-Administrator-Guide/Automations
+      scriptName: DeleteContext
+      type: regular
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "1"
+    scriptarguments:
+      key:
+        simple: SingleTarget
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 265,
+          "y": 400
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "13":
+    id: "13"
+    taskid: 9f787e47-b1d4-43e4-873b-8b7516c55ce7
+    type: regular
+    task:
+      id: 9f787e47-b1d4-43e4-873b-8b7516c55ce7
+      version: -1
+      name: aws-s3-get-bucket-policy
+      description: Get AWS S3 Bucket Policy
+      script: AWS - S3|||aws-s3-get-bucket-policy
+      type: regular
+      iscommand: true
+      brand: AWS - S3
+    nexttasks:
+      '#error#':
+      - "4"
+      '#none#':
+      - "14"
+    scriptarguments:
+      bucket:
+        simple: ${inputs.bucket}
+      extend-context:
+        simple: getJson=Json
+    separatecontext: false
+    continueonerror: true
+    continueonerrortype: errorPath
+    view: |-
+      {
+        "position": {
+          "x": 265,
+          "y": 1100
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "14":
+    id: "14"
+    taskid: e84fa035-6ba3-4afd-85f3-f579f88aaa47
+    type: regular
+    task:
+      id: e84fa035-6ba3-4afd-85f3-f579f88aaa47
+      version: -1
+      name: MergeS3BucketPolicy
+      description: Merge the statements of multiple s3 bucket policies. The statements
+        inside of secondPolicy will be added to those in first policy
+      scriptName: MergeS3BucketPolicy
+      type: regular
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "15"
+    scriptarguments:
+      extend-context:
+        simple: Json=json
+      firstPolicy:
+        simple: ${getJson}
+      secondPolicy:
+        simple: |-
+          {
+          "Version": "2012-10-17",
+          "Statement": [
+          {
+          "Sid": "DenyGetBucket",
+          "Effect": "Deny",
+          "Principal": "*",
+          "Action": [
+          "s3:GetObject"
+          ],
+          "Resource": ${Targets}
+          }
+          ]
+          }
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 480,
+          "y": 1275
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "15":
+    id: "15"
+    taskid: 16c6d5e0-7ed9-4ecc-8b3d-e337053df472
+    type: regular
+    task:
+      id: 16c6d5e0-7ed9-4ecc-8b3d-e337053df472
+      version: -1
+      name: aws-s3-put-bucket-policy
+      description: Replaces a policy on a bucket. If the bucket already has a policy,
+        the one in this request completely replaces it.
+      script: AWS - S3|||aws-s3-put-bucket-policy
+      type: regular
+      iscommand: true
+      brand: AWS - S3
+    nexttasks:
+      '#none#':
+      - "5"
+    scriptarguments:
+      bucket:
+        simple: ${inputs.bucket}
+      confirmRemoveSelfBucketAccess:
+        simple: "False"
+      policy:
+        simple: ${MergeS3BucketPolicy.json}
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 480,
+          "y": 1450
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+view: |-
+  {
+    "linkLabelsPosition": {},
+    "paper": {
+      "dimensions": {
+        "height": 1655,
+        "width": 810,
+        "x": 50,
+        "y": 65
+      }
+    }
+  }
+inputs:
+- key: bucket
+  value: {}
+  required: false
+  description: The bucket policy will be applied to.
+  playbookInputQuery: null
+outputs: []
