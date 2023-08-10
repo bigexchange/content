@@ -1,0 +1,468 @@
+commonfields:
+  id: BigId
+  version: -1
+vcShouldKeepItemLegacyProdMachine: false
+name: BigId
+display: BigId
+category: Utilities
+description: Integration for performing actions with a BigId instance. Manage data properly using data Discovery and Classification.
+configuration:
+- section: Connect
+  display: 'Server URL '
+  name: url
+  type: 0
+  required: true
+- section: Connect
+  display: apikey
+  displaypassword: API Key
+  name: apikey
+  type: 9
+  required: true
+  hiddenusername: true
+- display: Trust any certicicate (not secure)
+  name: insecure
+  defaultvalue: "true"
+  type: 8
+  required: false
+- display: Use system proxy settings
+  name: proxy
+  defaultvalue: "true"
+  type: 8
+  required: false
+script:
+  script: ''
+  type: python
+  commands:
+  - name: get-data-sources
+    arguments: []
+    outputs:
+    - contextPath: Datasources
+      description: The list of data sources returned, probably convert from list to string
+      type: string
+    - contextPath: BigId.Datasources.results
+      description: array of object
+    - contextPath: BigId.Datasources.results.dataSourceName
+      type: string
+    description: Returns names of all scanned data sources.
+  - name: get-objects-from-catalog
+    arguments:
+    - name: skip
+      description: skipdesc
+      defaultValue: "0"
+      type: unknown
+    - name: limit
+      description: limitdesc
+      defaultValue: "200"
+    - name: filter
+      description: filterdesc
+      type: textArea
+    - name: sort
+      description: sortdesc
+      type: textArea
+    - name: ignoreLimit
+      description: ignorelimitdesc
+      defaultValue: "false"
+      type: unknown
+    - name: sample
+      description: sampledesc
+    - name: requireTotalCount
+      description: requireTotalCountedesc
+      defaultValue: "false"
+    - name: getColumnOrFieldOccurrencesCounterFlag
+      description: getColumnOrFieldOccurrencesCounterFlagdesc
+      defaultValue: "false"
+    - name: getNumIdentitiesFlag
+      description: getNumIdentitiesFlagdesc
+      defaultValue: "false"
+    - name: objectsCountTimeoutSec
+      default: true
+      description: objectsCountTimeoutSecdesc
+      defaultValue: "30"
+    outputs:
+    - contextPath: BigId.FilteredObjects
+      description: output for object get command
+    - contextPath: BigId.FilteredObjects.results
+      description: the results
+    - contextPath: BigId.FilteredObjects.results.fullyQualifiedName
+      description: ""
+      type: string
+    - contextPath: BigId.FilteredObjects.results.source
+      type: string
+    - contextPath: BigId.FilteredObjects.results.type
+      type: string
+    - contextPath: BigId.FilteredObjects.results.fullObjectName
+      type: string
+    - contextPath: BigId.FilteredObjects.results.containerName
+      type: string
+    - contextPath: BigId.FilteredObjects.results.objectName
+      type: string
+    - contextPath: BigId.FilteredObjects.results.application_name
+    - contextPath: BigId.FilteredObjects.results.has_duplicates
+      type: string
+    - contextPath: BigId.FilteredObjects.results.language
+      type: string
+    - contextPath: BigId.FilteredObjects.results.location
+      type: string
+    - contextPath: BigId.FilteredObjects.results.modified_date
+      type: string
+    - contextPath: created_date
+      type: string
+    - contextPath: BigId.FilteredObjects.results.objectType
+      type: string
+    - contextPath: BigId.FilteredObjects.results.extendedObjectType
+      type: string
+    - contextPath: BigId.FilteredObjects.results.open_access
+      type: string
+    - contextPath: BigId.FilteredObjects.results.scanDate
+      type: date
+    - contextPath: BigId.FilteredObjects.results.scanId
+      type: string
+    - contextPath: BigId.FilteredObjects.results.duplicate_id
+    - contextPath: BigId.FilteredObjects.results.cluster_id
+    - contextPath: BigId.FilteredObjects.results.cluster_id.fileId
+      type: string
+    - contextPath: BigId.FilteredObjects.results.cluster_id.file_info
+      type: string
+    - contextPath: BigId.FilteredObjects.results.document_type
+    - contextPath: BigId.FilteredObjects.results.document_type.owner_friendly_name
+      type: string
+    - contextPath: BigId.FilteredObjects.results.document_type.owner
+      type: string
+    - contextPath: BigId.FilteredObjects.results.document_type.ownersList
+    - contextPath: BigId.FilteredObjects.results.document_type.object_owners_struct
+    - contextPath: BigId.FilteredObjects.results.document_type.ds_owner
+    - contextPath: BigId.FilteredObjects.results.document_type.attribute
+    - contextPath: BigId.FilteredObjects.results.attribute_details
+      description: array of object
+    - contextPath: BigId.FilteredObjects.results.attribute_details.name
+      type: string
+    - contextPath: BigId.FilteredObjects.results.attribute_details.friendlyName
+      type: string
+    - contextPath: BigId.FilteredObjects.results.attribute_details.count
+      type: number
+    - contextPath: BigId.FilteredObjects.results.attribute_details.type
+      description: 'Allowed: IDSoR Attribute┃Enrichment Attribute┃Classification┃ClassificationMd┃Composite Fields┃Manual┃Prediction'
+    - contextPath: BigId.FilteredObjects.results.attribute_details.ranks
+      description: ' Allowed: HIGH┃MEDIUM┃LOW'
+    - contextPath: BigId.FilteredObjects.results.attribute_original_name
+    - contextPath: BigId.FilteredObjects.results.tags
+    - contextPath: BigId.FilteredObjects.results.comment
+      type: string
+    - contextPath: BigId.FilteredObjects.results.totalRowsCounter
+      type: number
+    - contextPath: BigId.FilteredObjects.results.estimatedCount
+      type: number
+    description: Returns objects and their metadata from the catalog.
+  - name: get-ds-connections
+    arguments:
+    - name: skip
+      description: num sources to skip
+      defaultValue: "0"
+    - name: limit
+      description: max number of sources to return
+      defaultValue: "100"
+    - name: requireTotalCount
+      description: boolean for adding totalcount column
+      defaultValue: "false"
+    - name: sort
+      description: 'Sort the results in ascending or descending order. '
+    - name: filter
+      description: filter results with this string
+    outputs:
+    - contextPath: BigId.DatasourceConnections
+      description: connections returned by get-ds-connections-command
+    - contextPath: BigId.DatasourceConnections.data
+    - contextPath: BigId.DatasourceConnections.message
+      type: string
+    - contextPath: BigId.DatasourceConnections.status
+      type: string
+    - contextPath: BigId.DatasourceConnections.statusCode
+      type: number
+    - contextPath: BigId.DatasourceConnections.data.totalCount
+      type: number
+    - contextPath: BigId.DatasourceConnections.data.ds_connections
+      description: Array of object
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.name
+      description: ' Indicates the name for this data source connection.'
+      type: string
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.friendly_name
+      description: Indicates the category or display name for the data source.
+      type: string
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.enabled
+      description: ' Indicates whether to include or exclude this data source in full scans.  The status is Enabled by default (included in full scans). Disabled data source connections will not be scanned.'
+      type: string
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.type
+      description: Indicates the data source type. For example, smb or salesforce.
+      type: string
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.comment
+      description: Free text with additional information about the data source.
+      type: string
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.description
+      description: Optional text with additional information about the data source.
+      type: string
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.is_credential
+      description: Indicates if authentication is performed via a BigID credential.
+      type: boolean
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.credential_id
+      description: Indicates the ID of the authentication credential.
+      type: string
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.is_idsor_supported
+      description: ' Indicates whether the data source supports correlation learning sets.  Identity Source of Record (IDSoR) is an attribute found through correlation which can uniquely identify an entity within a given organization.'
+      type: boolean
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.username
+      description: The account username for logging into the data source.
+      type: string
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.password
+      description: The password associated with the account username for logging into the data source.
+      type: string
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.scanner_group
+      description: Indicates the group of scanner instances used for scanning this data source.
+      type: string
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.testConnectionTimeoutInSeconds
+      description: Indicates the number of seconds to wait before timing out the test connection.
+      type: number
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.location
+      description: ' Indicates the country, state, or territory where the data source is located.  Location details about scanned data help with data mapping in the data catalog and are often essential for meeting compliance regulations.'
+      type: string
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.security_tier
+      description: 'An assessment level between 1-5 to indicate the risk of exposure associated with the data in this data source.  Allowed: 1┃2┃3┃4┃5'
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.scanTimeoutInSeconds
+      description: Indicates the number of seconds to wait before timing out the scan connection
+      type: number
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.numberOfParsingThreads
+      description: ' Indicates how many scans can run in parallel.  The higher the number, the more processing and communication resources will be used. For scanning large data sources, you can increase the number of threads to run more scans in parallel. Default value: 5'
+      type: string
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.structured_clustering_enabled
+      description: ' Indicates if clustering is enabled (true) or not (false)  BigID''s clustering feature is a machine-learning technique that groups of files or columns based on the similarity of their content.'
+      type: boolean
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.classification_is_enabled
+      description: ' Indicates if classification is enabled (true) or not (false).  BigID''s classification feature is a machine-learning technique that identifies and categorizes data according to word and sentence patterns and grammatical structures.'
+      type: boolean
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.differential
+      description: Indicates if differential scans are enabled (true) or not (false).
+      type: boolean
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.is_modified_in_x_days
+      description: When differential scans are enabled, indicates to scan for changes since the last scan.
+      type: boolean
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.x_last_days
+      description: When differential scans are enabled, scans for changes in the last specified number of days.
+      type: number
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.archived
+      description: Indicates if the data source has been archived.
+      type: boolean
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.custom_fields
+      description: Specifies the custom parameters that were added to this connection.
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.custom_fields.field_name
+      type: string
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.custom_fields.fields_value
+      type: string
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.custom_fields.field_type
+      type: string
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.owners
+      description: Indicates the list of data owners.
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.owners_v2
+      description: Indicated data owner details.
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.owners_v2.id
+      type: string
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.owners_v2.origin
+      type: string
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.owners_v2.email
+      type: string
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.owners_v2.type
+      description: ' Allowed: business┃it'
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.tags
+      description: Specifies tags associated with this data source.
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.tags.tagId
+      type: string
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.tags.valueId
+      type: string
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.idDsarOnly
+      description: Indicates if this is a DSAR-only data source.
+      type: boolean
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.isFromDiscoveryApp
+      type: boolean
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.discoveryAppType
+      description: ' Allowed: gcp┃aws┃azure'
+    - contextPath: BigId.DatasourceConnections.data.ds_connections._id
+      type: string
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.created_at
+      type: date
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.update_at
+      type: date
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.connectionStatusScan
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.connectionStatusScan.is_success
+      type: boolean
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.connectionStatusScan.last_connection
+      type: date
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.connectionStatusScan.num_of_object
+      type: number
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.connectionStatusTest
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.connectionStatusTest.is_success
+      type: boolean
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.connectionStatusTest.last_connection
+      type: date
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.connectionStatusTest.num_of_object
+      type: number
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.connectionStatusDeleteFindings
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.connectionStatusDeleteFindings.is_success
+      type: boolean
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.connectionStatusDeleteFindings.last_connection
+      type: date
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.connectionStatusDeleteFindings.num_of_object
+      type: number
+    - contextPath: BigId.DatasourceConnections.data.ds_connections.hyperScanModelAvailable
+      type: boolean
+    description: Returns datasource connections and their metadata to context.
+  - name: initiate-scan
+    arguments:
+    - name: scanType
+      required: true
+      auto: PREDEFINED
+      predefined:
+      - lineageScan
+      - dataInMotion
+      - metadataScan
+      - dsScan
+      description: Type of scan
+    - name: scanProfileName
+      description: The profile name to use
+    - name: scanOrigin
+    - name: pii_record_id
+      description: For investigation scan only
+    - name: with_investigation_window
+      description: boolean
+    - name: record
+      description: For investigation scan only
+    - name: type
+      description: For investigation scan only
+    outputs:
+    - contextPath: BigId.InitiatedScan
+    - contextPath: BigId.InitatedScan.result
+    - contextPath: BigId.InitatedScan.result._id
+      type: string
+    - contextPath: BigId.InitatedScan.result.allEnabledDs
+      type: boolean
+    - contextPath: BigId.InitatedScan.result.allEnabledIdSor
+      type: boolean
+    - contextPath: BigId.InitatedScan.result.correlationFilterEntitySource
+      type: boolean
+    - contextPath: BigId.InitatedScan.result.created_at
+      type: string
+    - contextPath: BigId.InitatedScan.result.dsConnectionList
+    - contextPath: BigId.InitatedScan.result.folderToLabelMapping
+      type: string
+    - contextPath: BigId.InitatedScan.result.idConnectionList
+    - contextPath: BigId.InitatedScan.result.identityResolutionScan
+      type: boolean
+    - contextPath: BigId.InitatedScan.result.ignoreClassificationFindings
+      type: boolean
+    - contextPath: BigId.InitatedScan.result.info
+      type: string
+    - contextPath: BigId.InitatedScan.result. isClassificationsAsPiiFindings
+      type: boolean
+    - contextPath: BigId.InitatedScan.result. isCustomScanProfile
+      type: boolean
+    - contextPath: BigId.InitatedScan.result.modelId
+      type: string
+    - contextPath: BigId.InitatedScan.result.name
+      type: string
+    - contextPath: BigId.InitatedScan.result.origin
+      type: string
+    - contextPath: BigId.InitatedScan.result. scan_progress_status
+    - contextPath: BigId.InitatedScan.result. shouldCreateClassifiers
+      type: boolean
+    - contextPath: BigId.InitatedScan.result. skipIdScan
+      type: boolean
+    - contextPath: BigId.InitatedScan.result.state
+      type: string
+    - contextPath: BigId.InitatedScan.result.scanPageState
+      type: string
+    - contextPath: BigId.InitatedScan.result.type
+      type: string
+    - contextPath: BigId.InitatedScan.result.updated_at
+      type: string
+    - contextPath: BigId.InitatedScan.result.id
+      type: string
+    - contextPath: BigId.InitatedScan.result.es_stat_started
+      type: string
+    - contextPath: BigId.InitatedScan.result.es_stat_completed
+      type: string
+    - contextPath: BigId.InitatedScan.result.identityCacheStatus
+      type: string
+    - contextPath: BigId.InitatedScan.result.scanSecretKey
+      type: string
+    - contextPath: BigId.InitatedScan.result.scanner_identities_count
+      type: number
+    - contextPath: BigId.InitatedScan.result.identities_scanned
+      type: number
+    - contextPath: BigId.InitatedScan.result. correlation_completed
+      type: boolean
+    - contextPath: BigId.InitatedScan.result. correlation_completed_dt
+      type: string
+    - contextPath: BigId.InitatedScan.result. piisummary_completed_dt
+      type: string
+    - contextPath: BigId.InitatedScan.result. scanManagementComplete
+      type: string
+    - contextPath: BigId.InitatedScan.result. isReviewFindingsEnabled
+      type: boolean
+    - contextPath: BigId.InitatedScan.result. executedBy
+      type: string
+    description: Initiates a scan using the provided scan profile.
+  - name: get-scans-status
+    arguments: []
+    outputs:
+    - contextPath: BigId.ScansStatus
+      description: The status of all current scans
+    - contextPath: BigId.ScansStatus.data
+    - contextPath: BigId.ScansStatus.data.message
+      type: string
+    - contextPath: BigId.ScansStatus.data.urlRef
+      type: string
+    - contextPath: BigId.ScansStatus.data.urlMessage
+      type: string
+    - contextPath: BigId.ScansStatus.data.type
+      type: string
+    description: Get full list of scans in the system and their status.
+  - name: run-ds-scan
+    arguments:
+    - name: connectionName
+      required: true
+      description: Data source name
+    - name: isSampleScan
+      description: is sample scan?
+    - name: scanType
+      auto: PREDEFINED
+      predefined:
+      - dsScan
+      - lineageScan
+      - metadataScan
+      - dataInMotion
+      description: scan type; one of the known BigID scan types
+    - name: autoAssumeScanType
+      description: Should server assume the scan type automatically? if set as true, scan type of "s3" will be HyperScan and "kinesis" will be scanned with Data In Motion scan.
+    outputs:
+    - contextPath: BigId.DatasourceScanResults
+    - contextPath: BigId.DatasourceScanResults.data
+    - contextPath: BigId.DatasourceScanResults.data.dsConnectionName
+      type: string
+    - contextPath: BigId.DatasourceScanResults.data.isSampleScan
+      type: boolean
+    - contextPath: BigId.DatasourceScanResults.data.isScheduled
+      type: boolean
+    - contextPath: BigId.DatasourceScanResults.data.scanProfileName
+      type: string
+    - contextPath: BigId.DatasourceScanResults.data.scanType
+      type: string
+    - contextPath: BigId.DatasourceScanResults.data.state
+      type: string
+    - contextPath: BigId.DatasourceScanResults.message
+      type: string
+    - contextPath: BigId.DatasourceScanResults.status
+      type: string
+    - contextPath: BigId.DatasourceScanResults.statusCode
+      type: number
+    description: Run a scan on a data source.
+  dockerimage: demisto/python3:3.10.9.42476
+  runonce: false
+  subtype: python3
+
