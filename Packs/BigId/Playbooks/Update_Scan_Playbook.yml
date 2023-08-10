@@ -1,0 +1,311 @@
+id: c206437f-60c1-4932-807e-3e7efd49a541
+version: 43
+vcShouldKeepItemLegacyProdMachine: false # disable-secrets-detection
+name: Update Scan Playbook
+description: Given the full object name of an object in bigid, determine the name
+  of the data source it belongs to. Then scan it if it has not been scanned within
+  the last 7 days.
+starttaskid: "0"
+tasks:
+  "0":
+    id: "0"
+    taskid: 39ebaeae-34d3-49b1-8ba5-b3998961baeb
+    type: start
+    task:
+      id: 39ebaeae-34d3-49b1-8ba5-b3998961baeb
+      version: -1
+      name: ""
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "6"
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 50,
+          "y": 50
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "1":
+    id: "1"
+    taskid: d2ff8d90-565d-40fa-8ddf-70abea6d4052
+    type: regular
+    task:
+      id: d2ff8d90-565d-40fa-8ddf-70abea6d4052
+      version: -1
+      name: run-ds-scan
+      description: Run a scan on a data source.
+      script: BigId|||run-ds-scan
+      type: regular
+      iscommand: true
+      brand: BigId
+    nexttasks:
+      '#error#':
+      - "10"
+      '#none#':
+      - "9"
+    scriptarguments:
+      connectionName:
+        simple: ${BigId.FilteredObjects.results.[0].source}
+      scanType:
+        simple: dsScan
+    separatecontext: false
+    continueonerror: true
+    continueonerrortype: errorPath
+    view: |-
+      {
+        "position": {
+          "x": 162.5,
+          "y": 925
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "2":
+    id: "2"
+    taskid: debc1a08-5df0-44ef-8bca-ceb45542c103
+    type: regular
+    task:
+      id: debc1a08-5df0-44ef-8bca-ceb45542c103
+      version: -1
+      name: get-ds-connections
+      description: new get ds connections command
+      script: BigId|||get-ds-connections
+      type: regular
+      iscommand: true
+      brand: BigId
+    nexttasks:
+      '#none#':
+      - "7"
+    scriptarguments:
+      filter:
+        simple: '[{ "field": "name", "value": "${BigId.FilteredObjects.results.[0].source}",
+          "operator": "contains"}]'
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 50,
+          "y": 400
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "6":
+    id: "6"
+    taskid: cdcfad02-d6ed-42e8-8135-32ca27d5e568
+    type: regular
+    task:
+      id: cdcfad02-d6ed-42e8-8135-32ca27d5e568
+      version: -1
+      name: get-objects-from-catalog
+      description: get the objects
+      script: BigId|||get-objects-from-catalog # disable-secrets-detection
+      type: regular
+      iscommand: true
+      brand: BigId
+    nexttasks:
+      '#none#':
+      - "2"
+    scriptarguments:
+      filter:
+        simple: fullyQualifiedName = "${inputs.fullyQualifiedName}"
+      limit:
+        simple: "1"
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 50,
+          "y": 225
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "7":
+    id: "7"
+    taskid: baffe6d5-1770-4c41-82b0-97bf36fe9618
+    type: regular
+    task:
+      id: baffe6d5-1770-4c41-82b0-97bf36fe9618
+      version: -1
+      name: Get time x days ago
+      description: |
+        Retrieves the current date and time.
+      scriptName: GetTime
+      type: regular
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "8"
+    scriptarguments:
+      daysAgo:
+        simple: "7"
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 50,
+          "y": 575
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "8":
+    id: "8"
+    taskid: cc994602-e5c7-4247-8752-2d99cb06e091
+    type: condition
+    task:
+      id: cc994602-e5c7-4247-8752-2d99cb06e091
+      version: -1
+      name: Not scanned within the last week
+      description: |-
+        Checks if one number(float) as bigger than the other(float)
+        Returns yes: if first > second
+        Returns no: if first <= second
+        Returns exception if one of the inputs is not a number
+      scriptName: IsGreaterThan
+      type: condition
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#default#':
+      - "9"
+      "yes":
+      - "1"
+    scriptarguments:
+      first:
+        simple: ${TimeNowUnix}
+      second:
+        simple: ${BigId.DatasourceConnections.data.ds_connections.[0].last_scan_at}
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 50,
+          "y": 750
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "9":
+    id: "9"
+    taskid: bac989d7-413a-4d1d-8bce-b76b35041923
+    type: regular
+    task:
+      id: bac989d7-413a-4d1d-8bce-b76b35041923
+      version: -1
+      name: closeInvestigation
+      description: Close the current incident
+      script: Builtin|||closeInvestigation
+      type: regular
+      iscommand: true
+      brand: Builtin
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 50,
+          "y": 1275
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "10":
+    id: "10"
+    taskid: c4184e76-d090-4d0a-8c47-e27b1b9dfe17
+    type: regular
+    task:
+      id: c4184e76-d090-4d0a-8c47-e27b1b9dfe17
+      version: -1
+      name: Failed to scan ${BigId.FilteredObjects.results.[0].source}. Scan manually
+        before closing
+      type: regular
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "9"
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 275,
+          "y": 1100
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+view: |-
+  {
+    "linkLabelsPosition": {
+      "8_9_#default#": 0.67
+    },
+    "paper": {
+      "dimensions": {
+        "height": 1320,
+        "width": 605,
+        "x": 50,
+        "y": 50
+      }
+    }
+  }
+inputs:
+- key: fullyQualifiedName
+  value: {}
+  required: false
+  description: ""
+  playbookInputQuery: null
+outputs: []
