@@ -10,10 +10,6 @@ urllib3.disable_warnings()
 
 ''' CONSTANTS '''
 
-DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
-MAX_INCIDENTS_TO_FETCH = 50
-DEFAULT_INDICATORS_THRESHOLD = 65
-HELLOWORLD_SEVERITIES = ['Low', 'Medium', 'High', 'Critical']
 
 ''' CLIENT CLASS '''
 
